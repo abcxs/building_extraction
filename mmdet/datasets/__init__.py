@@ -1,4 +1,5 @@
 from .builder import DATASETS, PIPELINES, build_dataloader, build_dataset
+from .building import BuildingDataset
 from .cityscapes import CityscapesDataset
 from .coco import CocoDataset
 from .custom import CustomDataset
@@ -18,5 +19,5 @@ __all__ = [
     'LVISV1Dataset', 'GroupSampler', 'DistributedGroupSampler',
     'DistributedSampler', 'build_dataloader', 'ConcatDataset', 'RepeatDataset',
     'ClassBalancedDataset', 'WIDERFaceDataset', 'DATASETS', 'PIPELINES',
-    'build_dataset', 'replace_ImageToTensor'
+    'build_dataset', 'replace_ImageToTensor', 'BuildingDataset'
 ]
