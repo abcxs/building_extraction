@@ -10,3 +10,4 @@ data = dict(
     test=dict(
         ann_file=data_root + 'val/val.json',
         img_prefix=data_root + 'val/JPEGImages/'))
+        

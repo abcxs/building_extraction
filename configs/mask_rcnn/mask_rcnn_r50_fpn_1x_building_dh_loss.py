@@ -22,3 +22,4 @@ model = dict(
                 type='CrossEntropyLoss', use_sigmoid=False, loss_weight=2.0),
             loss_bbox=dict(type='L1Loss', loss_weight=2.0))))
 optimizer = dict(lr=0.0025)
+

@@ -4,3 +4,4 @@ model = dict(
         bbox_head=dict(
             loss_cls=dict(loss_weight=1.0),
             loss_bbox=dict(loss_weight=1.0))))
+            
