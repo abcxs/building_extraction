@@ -60,6 +60,7 @@ RUN conda clean --all
 WORKDIR /root
 RUN git clone -b building https://github.com/abcxs/building_extraction.git mmdetection
 WORKDIR /root/mmdetection
+RUN git pull
 ENV FORCE_CUDA="1"
 RUN pip install -r requirements/build.txt && pip install --no-cache-dir -e .
 WORKDIR /root/mmdetection/mmdet/rotation_libs
