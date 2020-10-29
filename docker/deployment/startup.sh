@@ -6,6 +6,7 @@ rm -f /run/xrdp/xrdp*
 /root/.init/config.sh &
 
 #config nvidia
+source /root/.bashrc
 ldconfig
 
 #/etc/init.d/xrdp restart
