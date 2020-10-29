@@ -6,6 +6,7 @@ rm -f /run/xrdp/xrdp*
 /root/.init/config.sh &
 
 #config nvidia
+/opt/conda/bin/conda init
 source /root/.bashrc
 ldconfig
 

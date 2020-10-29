@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import argparse
 import config as cfg
 import gdal
@@ -33,12 +35,12 @@ def parse_args():
         'checkpoint',
         help='checkpoint file',
     )
-    params = ['/home/ndrcchkygb/project/data1/tif_guizhou_demo',
-              '/home/ndrcchkygb/project/temp_result/t4',
-              '/home/ndrcchkygb/code/mmdetection/configs/mask_rcnn/mask_rcnn_r50_fpn_1x_building_base_fp_background_ms.py',
-              '/home/ndrcchkygb/code/mmdetection/work_dirs/mask_rcnn_r50_fpn_1x_building_base_fp_background_ms/epoch_12.pth',
-              ]
-    return parser.parse_args(params)
+    # params = ['/home/ndrcchkygb/project/data1/tif_guizhou_demo',
+    #           '/home/ndrcchkygb/project/temp_result/t4',
+    #           '/home/ndrcchkygb/code/mmdetection/configs/mask_rcnn/mask_rcnn_r50_fpn_1x_building_base_fp_background_ms.py',
+    #           '/home/ndrcchkygb/code/mmdetection/work_dirs/mask_rcnn_r50_fpn_1x_building_base_fp_background_ms/epoch_12.pth',
+    #           ]
+    return parser.parse_args()
 
 
 def deal_with_single_tif(tif_file, output_dir, config_file, checkpoint):
