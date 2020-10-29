@@ -1,15 +1,13 @@
 import argparse
+import config as cfg
+import gdal
 import multiprocessing
 import os
 import pickle
 import subprocess
 import sys
 import time
-
-import gdal
 import torch
-
-import config as cfg
 from detect import detect
 from gen_shp import gen_shp
 from post_process import post_process
@@ -45,6 +43,8 @@ def parse_args():
 
 def deal_with_single_tif(tif_file, output_dir, config_file, checkpoint):
     gpus = get_gpus()
+    gpus_info = [str(id_) for id_ in gpus]
+    logger.info('使用GPU:%s' % ','.join(gpus_info))
 
     process_per_gpu = cfg.process_per_gpu
     num_of_process = len(gpus) * process_per_gpu

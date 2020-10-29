@@ -1,18 +1,18 @@
 # import os
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
-import logging
-import os
-import time
-from collections import OrderedDict
-from contextlib import contextmanager
-
 import cv2
 import gdal
+import logging
 import numpy as np
+import os
+import time
 import torch
+from collections import OrderedDict
+from contextlib import contextmanager
 from mmcv.ops import bbox_overlaps
 from mmcv.ops.nms import nms
+
 from mmdet.rotation_libs.rotate_polygon_nms import rotate_gpu_nms
 
 
@@ -144,10 +144,12 @@ def remove_small_bboxes(bboxes, min_size):
 
 def get_gpus():
     gpus = os.environ.get('BUILDING_CUDA', None)
+    num = torch.cuda.device_count()
     if gpus:
         gpus = list(map(int, gpus.replace(' ', '').split(',')))
+        gpus = [id_ for id_ in gpus if id_ < num]
     if not gpus:
-        gpus = list(range(torch.cuda.device_count()))
+        gpus = list(range(num))
     return gpus
 
 def nms_iof(dets, iou_thresh):
