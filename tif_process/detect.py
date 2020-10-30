@@ -1,21 +1,21 @@
-import itertools
-import os
-import pickle
-
+import config as cfg
 import cv2
 import gdal
+import itertools
 import mmcv
 import numpy as np
+import os
+import pickle
 import torch
+from approx_poly import approx
 from mmcv.cnn import fuse_conv_bn
 from mmcv.parallel import MMDataParallel, collate
 from mmcv.runner import load_checkpoint
+from tqdm import tqdm
+from utils import cut_into_blocks, findContours, logger, nms_iof
+
 from mmdet.datasets.pipelines import Compose
 from mmdet.models import build_detector
-from tqdm import tqdm
-
-import config as cfg
-from utils import cut_into_blocks, findContours, logger, nms_iof
 
 
 def inference_detector(model, img, test_pipeline):
@@ -45,7 +45,7 @@ def init_detector(config, checkpoint=None, device_id=0):
     model.eval()
     return model
 
-def parse_result(result, score_thr, lt):
+def parse_result(result, score_thr, lt, approx_polygon=False):
     bbox_result, segm_result = result
 
     bboxes = np.vstack(bbox_result)
@@ -86,7 +86,10 @@ def parse_result(result, score_thr, lt):
         contour = cv2.convexHull(contours)
 
         points = [label, score]
-        contour_ = contour.reshape(-1, 2) + lt
+        if approx_polygon:
+            contour_ = approx(contour.copy()).reshape(-1, 2) + lt
+        else:
+            contour_ = contour.reshape(-1, 2) + lt
         points.extend(contour_.reshape(-1).tolist())
         masks_img.append(points)
 
@@ -100,7 +103,7 @@ def parse_result(result, score_thr, lt):
     result = dict(boxes=bboxes_img, masks=masks_img, polys=polys_img) 
     return result
 
-def detect(process_id, gpu_id, config_file, checkpoint, tif_file, piece_list, output_dir):
+def detect(process_id, gpu_id, config_file, checkpoint, tif_file, piece_list, output_dir, approx_polygon=False):
     ds = gdal.Open(tif_file, gdal.GA_ReadOnly)
 
     model = init_detector(config_file, checkpoint, device_id=gpu_id)
@@ -123,7 +126,7 @@ def detect(process_id, gpu_id, config_file, checkpoint, tif_file, piece_list, ou
             
             result = inference_detector(model, image_patch, test_pipeline)
 
-            detection = parse_result(result, cfg.score_thr, [lt[0] + x, lt[1] + y])
+            detection = parse_result(result, cfg.score_thr, [lt[0] + x, lt[1] + y], approx_polygon)
             detections.append(detection)
 
     with open(os.path.join(output_dir, 'detection_%d.pkl' % process_id), 'wb') as f:

@@ -35,15 +35,17 @@ def parse_args():
         'checkpoint',
         help='checkpoint file',
     )
+    parser.add_argument('--approx_polygon', action='store_true')
     # params = ['/home/ndrcchkygb/project/data1/tif_guizhou_demo',
     #           '/home/ndrcchkygb/project/temp_result/t4',
     #           '/home/ndrcchkygb/code/mmdetection/configs/mask_rcnn/mask_rcnn_r50_fpn_1x_building_base_fp_background_ms.py',
     #           '/home/ndrcchkygb/code/mmdetection/work_dirs/mask_rcnn_r50_fpn_1x_building_base_fp_background_ms/epoch_12.pth',
+    #           '--approx_polygon'
     #           ]
     return parser.parse_args()
 
 
-def deal_with_single_tif(tif_file, output_dir, config_file, checkpoint):
+def deal_with_single_tif(tif_file, output_dir, config_file, checkpoint, approx_polygon):
     gpus = get_gpus()
     gpus_info = [str(id_) for id_ in gpus]
     logger.info('使用GPU:%s' % ','.join(gpus_info))
@@ -55,7 +57,7 @@ def deal_with_single_tif(tif_file, output_dir, config_file, checkpoint):
 
     if num_of_process == 0:
         detect(0, gpus[0], config_file, checkpoint, tif_file,
-               piece_list, output_dir)
+               piece_list, output_dir, approx_polygon)
     else:
         processes = []
         for i in range(num_of_process):
@@ -65,7 +67,7 @@ def deal_with_single_tif(tif_file, output_dir, config_file, checkpoint):
                 continue
             ctx = multiprocessing.get_context('spawn')
             p = ctx.Process(target=detect, args=(
-                i, gpu_id, config_file, checkpoint, tif_file, piece_list_per_process, output_dir))
+                i, gpu_id, config_file, checkpoint, tif_file, piece_list_per_process, output_dir, approx_polygon))
             p.start()
             processes.append(p)
 
@@ -114,9 +116,9 @@ if __name__ == "__main__":
 
         logger.info(f'开始处理 {tif_file}')
 
-        if os.path.exists(os.path.join(output_dir, 'flag')):
-            logger.info(f'{tif_file} 已经被处理过，跳过')
-            continue
+        # if os.path.exists(os.path.join(output_dir, 'flag')):
+        #     logger.info(f'{tif_file} 已经被处理过，跳过')
+        #     continue
 
         ds = gdal.Open(tif_file, gdal.GA_ReadOnly)
         if ds is None or ds.GetGeoTransform() is None:
@@ -127,7 +129,7 @@ if __name__ == "__main__":
 
         if not os.path.exists(os.path.join(output_dir, 'detection.pkl')):
             logger.info(f'开始检测 {tif_file}')
-            deal_with_single_tif(tif_file, output_dir, config_file, checkpoint)
+            deal_with_single_tif(tif_file, output_dir, config_file, checkpoint, args.approx_polygon)
 
         logger.info('开始后处理')
         width = ds.RasterXSize
