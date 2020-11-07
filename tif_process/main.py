@@ -36,8 +36,8 @@ def parse_args():
         help='checkpoint file',
     )
     parser.add_argument('--approx_polygon', action='store_true')
-    # params = ['/home/ndrcchkygb/project/data1/tif_guizhou_demo',
-    #           '/home/ndrcchkygb/project/temp_result/t4',
+    # params = ['/home/ndrcchkygb/data/sample',
+    #           '/home/ndrcchkygb/project/temp_result/t5',
     #           '/home/ndrcchkygb/code/mmdetection/configs/mask_rcnn/mask_rcnn_r50_fpn_1x_building_base_fp_background_ms.py',
     #           '/home/ndrcchkygb/code/mmdetection/work_dirs/mask_rcnn_r50_fpn_1x_building_base_fp_background_ms/epoch_12.pth',
     #           '--approx_polygon'
@@ -116,9 +116,9 @@ if __name__ == "__main__":
 
         logger.info(f'开始处理 {tif_file}')
 
-        # if os.path.exists(os.path.join(output_dir, 'flag')):
-        #     logger.info(f'{tif_file} 已经被处理过，跳过')
-        #     continue
+        if os.path.exists(os.path.join(output_dir, 'flag')):
+            logger.info(f'{tif_file} 已经被处理过，跳过')
+            continue
 
         ds = gdal.Open(tif_file, gdal.GA_ReadOnly)
         if ds is None or ds.GetGeoTransform() is None:
