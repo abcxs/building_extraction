@@ -1,9 +1,13 @@
-site = 'guangdong'
-input_dir = '/data/building_data/eval/%s' % site
-json_file = '/data/building/dst/%s/filelist.json' % site
-exclude_dir = []
+import os
 
-thresh = 0.3
-eval_type = 'bbox'
+site = 'qinghai'
+base_dir = '/home/ndrcchkygb/data/building/dst/%s' % site
+gt_dir = os.path.join(base_dir, 'eval', 'gt')
+prediction_dir = os.path.join(base_dir, 'eval', 'prediction')
+filelist_json = os.path.join(base_dir, 'filelist.json')
+
+exclude_dir = []
+threshold = 0.1
+eval_type = 'boxes'
 
 ovthresh = 0.1

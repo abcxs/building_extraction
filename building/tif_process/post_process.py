@@ -2,13 +2,11 @@
 #__author:"zfp"
 #data:2019/6/18
 
-import os
-import pickle
-
 import cv2
 import numpy as np
+import os
+import pickle
 import torch
-
 from utils import get_gpus, nms_bbox, nms_rbox, remove_small_bboxes
 
 
@@ -128,9 +126,9 @@ def post_process(output_dir, cfg, width, height):
             x_range = min(width - x_start, nms_size)
             y_range = min(height - y_start, nms_size)
 
-            if x_range <= nms_overlap_size and x > 0:
+            if x_range <= nms_overlap_size and x_start > 0:
                 continue
-            if y_range <= nms_overlap_size and y > 0:
+            if y_range <= nms_overlap_size and y_start > 0:
                 continue
             
             bboxes = boxlist.bboxes
@@ -200,9 +198,9 @@ def post_process(output_dir, cfg, width, height):
             x_range = min(width - x_start, nms_size)
             y_range = min(height - y_start, nms_size)
 
-            if x_range <= nms_overlap_size and x > 0:
+            if x_range <= nms_overlap_size and x_start > 0:
                 continue
-            if y_range <= nms_overlap_size and y > 0:
+            if y_range <= nms_overlap_size and y_start > 0:
                 continue
             
             rboxes = boxlist.bboxes

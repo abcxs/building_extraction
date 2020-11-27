@@ -1,10 +1,9 @@
-import os
-import pickle
-
 import gdal
 import ogr
+import os
 import osr
-
+import pickle
+from PIL import Image
 from utils import logger
 
 
@@ -16,7 +15,12 @@ def transformer(geoTransform, x, y):
 
 
 def gen_shp(ds, input_pkl, output_file, finsh_flag=None):
-    geoTransform = ds.GetGeoTransform()
+    ds_image = False
+    if isinstance(ds, Image.Image):
+        geoTransform = (0, 1, 0, 0, 0, -1)
+        ds_image = True
+    else:
+        geoTransform = ds.GetGeoTransform()
     gdal.SetConfigOption('SHAPE_ENCODING', "UTF8")
     gdal.SetConfigOption("GDAL_FILENAME_IS_UTF8", "YES")
     ogr.RegisterAll()
@@ -28,14 +32,13 @@ def gen_shp(ds, input_pkl, output_file, finsh_flag=None):
     if datasource is None:
         logger.info(f"2 {output_file} create failed!")
 
-    prosrs = osr.SpatialReference()
-    prosrs.ImportFromWkt(ds.GetProjection())
-
     srs = osr.SpatialReference()
     srs.ImportFromEPSG(4326)
-
-    ct = osr.CoordinateTransformation(prosrs, srs)
-
+    if not ds_image:
+        prosrs = osr.SpatialReference()
+        prosrs.ImportFromWkt(ds.GetProjection())
+        ct = osr.CoordinateTransformation(prosrs, srs)
+    
     layer = datasource.CreateLayer("BuildPolygon", srs, ogr.wkbPolygon)
     if layer is None:
         logger.info("3 failed!")
@@ -56,7 +59,8 @@ def gen_shp(ds, input_pkl, output_file, finsh_flag=None):
         ring = ogr.Geometry(ogr.wkbLinearRing)
         for point in polygon[1:]:
             new_point = transformer(geoTransform, point[0], point[1])
-            new_point = ct.TransformPoint(new_point[0], new_point[1])
+            if not ds_image:
+                new_point = ct.TransformPoint(new_point[0], new_point[1])
             ring.AddPoint(new_point[0], new_point[1])
 
         poly = ogr.Geometry(ogr.wkbPolygon)

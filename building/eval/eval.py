@@ -1,4 +1,4 @@
-import cfg
+import config as cfg
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -13,9 +13,9 @@ def parse_gt(filename):
         for splitline in splitlines:
             object_struct = {}
 
-            object_struct['name'] = splitline[0]
+            object_struct['name'] = 'building'
 
-            points = [float(p) for p in splitline[1:]]
+            points = [float(p) for p in splitline]
             x_min = min(points[0::2])
             x_max = max(points[0::2])
             y_min = min(points[1::2])
@@ -67,14 +67,14 @@ def voc_ap(rec, prec, use_07_metric=False):
         ap = np.sum((mrec[i + 1] - mrec[i]) * mpre[i + 1])
     return ap
 
-def voc_eval1(detpath, annopath, imagesetfile, classname, ovthresh=0.5, use_07_metric=False):
-
+def voc_eval(detpath, annopath, imagesetfile, classname, ovthresh=0.5, use_07_metric=False):
     with open(imagesetfile, 'r') as f:
         lines = f.readlines()
-    imagenames = [x.strip() for x in lines]
+    imagenames = [x.strip().split(' ')[0] for x in lines]
+    sites = [x.strip().split(' ')[1] for x in lines]
     recs = []
     precs = []
-    for imagename in imagenames:
+    for imagename, site in zip(imagenames, sites):
         npos = 0
         gt = parse_gt(annopath.format(imagename))
         R = [obj for obj in gt if obj['name'] == classname]
@@ -93,10 +93,14 @@ def voc_eval1(detpath, annopath, imagesetfile, classname, ovthresh=0.5, use_07_m
 
         confidence = np.array([float(x[1]) for x in splitlines if x[0] == imagename])
         BB = np.array([[float(z) for z in x[2:]] for x in splitlines if x[0] == imagename])
+        BB = BB.reshape(-1, 4, 2)
+        xymin = BB.min(axis=1)
+        xymax = BB.max(axis=1)
+        BB = np.concatenate([xymin, xymax], axis=-1)
 
         sorted_ind = np.argsort(-confidence)
         BB = BB[sorted_ind, :]
-
+        
         nd = BB.shape[0]
         tp = np.zeros(nd)
         fp = np.zeros(nd)
@@ -124,158 +128,42 @@ def voc_eval1(detpath, annopath, imagesetfile, classname, ovthresh=0.5, use_07_m
                 ovmax = np.max(overlaps)
                 jmax = np.argmax(overlaps)
                 lt_id = np.nonzero(ovmax > ovthresh)[0]
-
             if ovmax > ovthresh:
-                if not gt['difficult'][jmax]:
-                    tp[d] = 1
-                    gt['det'][jmax] = 1
+                for t in lt_id:
+                    gt['det'][t] = 1
+                tp[d] = 1
+                gt['det'][jmax] = 1
             else:
                 fp[d] = 1.
         rec = sum(gt['det']) / npos
         prec = sum(tp) / nd
-        print('gt:', npos, 'detect num:', sum(gt['det']), 'recall:', rec ,'prec:', prec, 'site:', imagename)
+        f1 = 2 * prec * rec / (prec + rec)
+        print('gt:', npos, 'detect num:', sum(gt['det']), 'recall:', rec ,'prec:', prec, 'f1:', f1, 'site:', site)
         
         recs.append(rec)
         precs.append(prec)
 
     return sum(recs) / len(recs), sum(precs) / len(precs), 0
 
-def voc_eval(detpath, annopath, imagesetfile, classname, ovthresh=0.5, use_07_metric=False):
-
-    with open(imagesetfile, 'r') as f:
-        lines = f.readlines()
-    imagenames = [x.strip() for x in lines]
-
-    recs = {}
-    for imagename in imagenames:
-        recs[imagename] = parse_gt(annopath.format(imagename))
-
-    # extract gt objects for this class
-    class_recs = {}
-    npos = 0
-    for imagename in imagenames:
-        R = [obj for obj in recs[imagename] if obj['name'] == classname]
-        bbox = np.array([x['bbox'] for x in R])
-        difficult = np.array([x['difficult'] for x in R]).astype(np.bool)
-
-        det = [False] * len(R)
-        npos = npos + sum(~difficult)
-        class_recs[imagename] = {'bbox': bbox,
-                                 'difficult': difficult,
-                                 'det': det}
-
-    # read dets
-    detfile = detpath.format(classname)
-    with open(detfile, 'r') as f:
-        lines = f.readlines()
-
-    splitlines = [x.strip().split(' ') for x in lines]
-    image_names = [x[0] for x in splitlines]
-    confidence = np.array([float(x[1]) for x in splitlines])
-
-    #print('check confidence: ', confidence)
-    BB = np.array([[float(z) for z in x[2:]] for x in splitlines])
-
-    # sort by confidence
-    sorted_ind = np.argsort(-confidence)
-
-    #print('check sorted_scores: ', sorted_scores)
-    #print('check sorted_ind: ', sorted_ind)
-    BB = BB[sorted_ind, :]
-    image_names = [image_names[x] for x in sorted_ind]
-
-    nd = len(image_names)
-    tp_overlap = np.zeros(nd)
-    tp = np.zeros(nd)
-    fp = np.zeros(nd)
-    
-    for d in range(nd):
-        R = class_recs[image_names[d]]
-        bb = BB[d, :].astype(float)
-        ovmax = -np.inf
-        BBGT = R['bbox'].astype(float)
-
-        if BBGT.size > 0:
-            ixmin = np.maximum(BBGT[:, 0], bb[0])
-            iymin = np.maximum(BBGT[:, 1], bb[1])
-            ixmax = np.minimum(BBGT[:, 2], bb[2])
-            iymax = np.minimum(BBGT[:, 3], bb[3])
-            iw = np.maximum(ixmax - ixmin + 1., 0.)
-            ih = np.maximum(iymax - iymin + 1., 0.)
-            inters = iw * ih
-
-            # union
-            uni = ((bb[2] - bb[0] + 1.) * (bb[3] - bb[1] + 1.) +
-                   (BBGT[:, 2] - BBGT[:, 0] + 1.) *
-                   (BBGT[:, 3] - BBGT[:, 1] + 1.) - inters)
-
-            overlaps = inters / uni
-            ovmax = np.max(overlaps)
-            ## if there exist 2
-            jmax = np.argmax(overlaps)
-            lt_id = np.nonzero(ovmax > ovthresh)[0]
-            for id_ in lt_id:
-                R['det'][id_] = 1
-
-        if ovmax > ovthresh:
-            if not R['difficult'][jmax]:
-                if not R['det'][jmax]:
-                    tp[d] = 1.
-                    tp_overlap[d] = 1.
-                    R['det'][jmax] = 1
-                else:
-                    tp_overlap[d] = 1.
-                    # change this
-                    # fp[d] = 1.
-        else:
-            fp[d] = 1.
-
-    print('npos num:', npos)
-    fp = np.cumsum(fp)
-    tp = np.cumsum(tp)
-    tp_overlap = np.cumsum(tp_overlap)
-
-    rec = tp / float(npos)
-    print(tp_overlap[-1] / nd)
-    prec = tp_overlap / np.maximum(tp_overlap + fp, np.finfo(np.float64).eps)
-
-    ap = voc_ap(rec, prec, use_07_metric)
-
-    t1 = 0
-    for imagename in imagenames:
-        t1 += sum(class_recs[imagename]['det'])
-    print(t1 / npos)
-
-    return rec, prec, ap
-
 def main():
-    detpath = os.path.join(cfg.input_dir, 'result/%s/{:s}.txt' % cfg.detect_type)
-    annopath = os.path.join(cfg.input_dir, 'data/{:s}.txt')
-    imagesetfile = os.path.join(cfg.input_dir, 'imageset.txt')
+    detpath = os.path.join(cfg.prediction_dir, '%s.txt' % cfg.eval_type)
+    annopath = os.path.join(cfg.gt_dir, '{:s}.txt')
+    imagesetfile = os.path.join(cfg.base_dir, 'eval/imageset.txt')
     ovthresh = cfg.ovthresh
 
     classnames = ['building']
 
-    classaps = []
-    map = 0
 
     for classname in classnames:
         print('classname:', classname)
-        rec, prec, ap = voc_eval1(detpath,
+        rec, prec, ap = voc_eval(detpath,
              annopath,
              imagesetfile,
              classname,
              ovthresh=ovthresh,
              use_07_metric=True)
-        map = map + ap
         print('recal:',rec, 'prec:', prec, 'ap:', ap)
-        classaps.append(ap)
 
-    map = map / len(classnames)
-    print('map:', map)
-    classaps = 100 * np.array(classaps)
-    print('classaps: ', classaps)
 
-    
 if __name__ == '__main__':
     main()

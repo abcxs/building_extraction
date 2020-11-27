@@ -12,6 +12,7 @@ from collections import OrderedDict
 from contextlib import contextmanager
 from mmcv.ops import bbox_overlaps
 from mmcv.ops.nms import nms
+from PIL import Image
 
 from mmdet.rotation_libs.rotate_polygon_nms import rotate_gpu_nms
 
@@ -49,17 +50,20 @@ def cut_into_pieces(tif_file, cfg):
     piece_size = cfg.piece_size
     piece_overlap_size = cfg.piece_overlap_size
 
-    piece_list = []
-    try:
-        ds = gdal.Open(tif_file, gdal.GA_ReadOnly)
-        width = ds.RasterXSize
-        height = ds.RasterYSize
-    except:
-        return piece_list
+    if check_image(tif_file):
+        ds = Image.open(tif_file)
+        width, height = ds.size
+    else:
+        try:
+            ds = gdal.Open(tif_file, gdal.GA_ReadOnly)
+            width = ds.RasterXSize
+            height = ds.RasterYSize
+        except:
+            return []
 
     if piece_size <= 0:
-        piece_list.append([0, 0, width, height])
-        return piece_list
+        return [[0, 0, width, height]]
+
     piece_list = cut_into_(width, height, piece_size, piece_overlap_size)
     return piece_list
 
@@ -69,15 +73,19 @@ def cut_into_blocks(ds, piece, cfg):
     detect_overlap_size = cfg.detect_overlap_size
 
     lt_x, lt_y, width, height = piece
-    try:
-        image = ds.ReadAsArray(lt_x, lt_y, width, height)
-    except:
-        return None, []
 
-    if (image == 255).all() or (image == 0).all():
-        return None, []
+    if isinstance(ds, np.ndarray):
+        image = ds[lt_y: lt_y + height, lt_x: lt_x + width]
+    else:
+        try:
+            image = ds.ReadAsArray(lt_x, lt_y, width, height)
+        except:
+            return None, []
 
-    image = image.astype(np.uint8).transpose([1, 2, 0])[:, :, ::-1]
+        if (image == 255).all() or (image == 0).all():
+            return None, []
+
+        image = image.astype(np.uint8).transpose([1, 2, 0])[:, :, ::-1]
 
     block_list = cut_into_(width, height, detect_size, detect_overlap_size)
     
@@ -179,6 +187,11 @@ def nms_iof(dets, iou_thresh):
     
     return dets[keep], keep
 
+def check_image(path):
+    ext = os.path.splitext(path)[1]
+    if ext in ['.png', '.jpg', '.JPEG']:
+        return True
+    return False
 
 def Singleton(cls):
     _instance = {}

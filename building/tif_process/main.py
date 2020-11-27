@@ -12,10 +12,12 @@ import time
 import torch
 from detect import detect
 from gen_shp import gen_shp
+from gen_txt import gen_txt
+from PIL import Image
 from post_process import post_process
-from utils import cut_into_pieces, get_gpus, logger
+from utils import check_image, cut_into_pieces, get_gpus, logger
 
-# os.environ['BUILDING_CUDA'] = '0,1,2,3,4,5,6,7'
+# os.environ['BUILDING_CUDA'] = '0'
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Building extraction')
@@ -36,10 +38,12 @@ def parse_args():
         help='checkpoint file',
     )
     parser.add_argument('--approx_polygon', action='store_true')
+    parser.add_argument('--eval', action='store_true')
     # params = ['/home/ndrcchkygb/data/sample',
     #           '/home/ndrcchkygb/project/temp_result/t5',
     #           '/home/ndrcchkygb/code/mmdetection/configs/mask_rcnn/mask_rcnn_r50_fpn_1x_building_base_fp_background_ms.py',
     #           '/home/ndrcchkygb/code/mmdetection/work_dirs/mask_rcnn_r50_fpn_1x_building_base_fp_background_ms/epoch_12.pth',
+    #           '--eval',
     #           '--approx_polygon'
     #           ]
     return parser.parse_args()
@@ -102,7 +106,7 @@ if __name__ == "__main__":
     tif_files = []
     for root, _, files in os.walk(input_dir):
         for f in files:
-            if f.endswith('.tif'):
+            if f.endswith('.tif') or check_image(f):
                 tif_file = os.path.join(root, f)
                 tif_files.append(tif_file)
 
@@ -119,11 +123,13 @@ if __name__ == "__main__":
         if os.path.exists(os.path.join(output_dir, 'flag')):
             logger.info(f'{tif_file} 已经被处理过，跳过')
             continue
-
-        ds = gdal.Open(tif_file, gdal.GA_ReadOnly)
-        if ds is None or ds.GetGeoTransform() is None:
-            logger.info(f'{tif_file} 打开失败，跳过')
-            continue
+        if check_image(tif_file):
+            ds = Image.open(tif_file)
+        else:
+            ds = gdal.Open(tif_file, gdal.GA_ReadOnly)
+            if ds is None or ds.GetGeoTransform() is None:
+                logger.info(f'{tif_file} 打开失败，跳过')
+                continue
 
         os.makedirs(output_dir, exist_ok=True)
 
@@ -132,27 +138,36 @@ if __name__ == "__main__":
             deal_with_single_tif(tif_file, output_dir, config_file, checkpoint, args.approx_polygon)
 
         logger.info('开始后处理')
-        width = ds.RasterXSize
-        height = ds.RasterYSize
+        if check_image(tif_file):
+            width, height = ds.size
+        else:
+            width = ds.RasterXSize
+            height = ds.RasterYSize
 
         post_process(output_dir, cfg, width, height)
         # p = multiprocessing.Process(
         #     target=post_process, args=(output_dir, cfg, width, height))
         # p.start()
         # p.join()
-
-        logger.info('生成shp文件')
-        pkl_files = ['poly', 'mask', 'boxes']
-        for pkl_file in pkl_files:
-            input_pkl = os.path.join(output_dir, '%s.pkl' % pkl_file)
-            output_file = os.path.join(
-                output_dir, '%s_%s.shp' % (file_name, pkl_file))
-            gen_shp(ds, input_pkl, output_file)
-
+        
+        if not args.eval:
+            logger.info('生成shp文件')
+            pkl_files = ['poly', 'mask', 'boxes']
+            for pkl_file in pkl_files:
+                input_pkl = os.path.join(output_dir, '%s.pkl' % pkl_file)
+                output_file = os.path.join(
+                    output_dir, '%s_%s.shp' % (file_name, pkl_file))
+                gen_shp(ds, input_pkl, output_file)   
+        else:
+            pkl_files = ['poly', 'mask', 'boxes']
+            for pkl_file in pkl_files:
+                input_pkl = os.path.join(output_dir, '%s.pkl' % pkl_file)
+                output_file = os.path.join(
+                    output_dir, '%s.txt' % pkl_file)
+                gen_txt(input_pkl, output_file)
         logger.info('生产结束文件')
         with open(os.path.join(output_dir, 'flag'), 'w') as f:
             f.write('')
-
         logger.info('删除多余文件')
         for pkl_file in pkl_files:
             os.remove(os.path.join(output_dir, '%s.pkl' % pkl_file))
@@ -164,3 +179,4 @@ if __name__ == "__main__":
         m, s = divmod(total_time, 60)
         h, m = divmod(m, 60)
         logger.info(f'处理 {tif_file} 花费 {h} 小时 {m} 分钟 {s} 秒.')
+

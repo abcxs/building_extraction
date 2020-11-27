@@ -12,7 +12,7 @@ from mmcv.cnn import fuse_conv_bn
 from mmcv.parallel import MMDataParallel, collate
 from mmcv.runner import load_checkpoint
 from tqdm import tqdm
-from utils import cut_into_blocks, findContours, logger, nms_iof
+from utils import check_image, cut_into_blocks, findContours, logger, nms_iof
 
 from mmdet.datasets.pipelines import Compose
 from mmdet.models import build_detector
@@ -104,7 +104,10 @@ def parse_result(result, score_thr, lt, approx_polygon=False):
     return result
 
 def detect(process_id, gpu_id, config_file, checkpoint, tif_file, piece_list, output_dir, approx_polygon=False):
-    ds = gdal.Open(tif_file, gdal.GA_ReadOnly)
+    if check_image(tif_file):
+        ds = cv2.imread(tif_file)
+    else:
+        ds = gdal.Open(tif_file, gdal.GA_ReadOnly)
 
     model = init_detector(config_file, checkpoint, device_id=gpu_id)
     cfg_ = model.cfg.copy()
