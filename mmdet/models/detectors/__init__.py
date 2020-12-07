@@ -11,6 +11,7 @@ from .gfl import GFL
 from .grid_rcnn import GridRCNN
 from .htc import HybridTaskCascade
 from .mask_rcnn import MaskRCNN
+from .mask_rcnn_finetune import MaskRCNNFinetune
 from .mask_scoring_rcnn import MaskScoringRCNN
 from .nasfcos import NASFCOS
 from .paa import PAA
@@ -28,5 +29,5 @@ __all__ = [
     'FastRCNN', 'FasterRCNN', 'MaskRCNN', 'CascadeRCNN', 'HybridTaskCascade',
     'RetinaNet', 'FCOS', 'GridRCNN', 'MaskScoringRCNN', 'RepPointsDetector',
     'FOVEA', 'FSAF', 'NASFCOS', 'PointRend', 'GFL', 'CornerNet', 'PAA',
-    'YOLOV3', 'YOLACT'
+    'YOLOV3', 'YOLACT', 'MaskRCNNFinetune'
 ]

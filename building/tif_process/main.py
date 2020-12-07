@@ -110,13 +110,14 @@ if __name__ == "__main__":
                 tif_file = os.path.join(root, f)
                 tif_files.append(tif_file)
 
-    input_dir = os.path.dirname(input_dir)
+    # 根目录 + 选择目录地址
+    base_input_dir = os.environ.get('BASE_INPUT_DIR', os.path.dirname(input_dir))
     for tif_file in tif_files:
         t1 = time.time()
 
         file_name = os.path.splitext(os.path.basename(tif_file))[0]
         output_dir = os.path.join(
-            root, file_name).replace(input_dir, args.output)
+            os.path.dirname(tif_file), file_name).replace(base_input_dir, args.output)
 
         logger.info(f'开始处理 {tif_file}')
 

@@ -12,7 +12,8 @@ from mmcv.cnn import fuse_conv_bn
 from mmcv.parallel import MMDataParallel, collate
 from mmcv.runner import load_checkpoint
 from tqdm import tqdm
-from utils import check_image, cut_into_blocks, findContours, logger, nms_iof
+from utils import (check_image, cut_into_blocks, findContours, logger,
+                   remove_inside_boxes)
 
 from mmdet.datasets.pipelines import Compose
 from mmdet.models import build_detector
@@ -56,8 +57,8 @@ def parse_result(result, score_thr, lt, approx_polygon=False):
     labels = np.concatenate(labels)
     inds = np.where(bboxes[:, -1] > score_thr)[0]
 
-    _, inds_iof = nms_iof(bboxes[inds], cfg.iof_thr)
-    inds = inds[inds_iof]
+    _, inds_inside = remove_inside_boxes(bboxes[inds])
+    inds = inds[inds_inside]
 
     segms = list(itertools.chain(*segm_result))
     segms = np.array(segms).astype(np.uint8)

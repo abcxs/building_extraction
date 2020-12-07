@@ -160,6 +160,20 @@ def get_gpus():
         gpus = list(range(num))
     return gpus
 
+def remove_inside_boxes(dets):
+    if len(dets) <= 0:
+        return dets, np.array([], dtype=np.int64)
+    # N, N, 5
+    diff = dets[:, None] - dets[None]
+    diff = diff[..., :4]
+    diff[..., 2:] *= -1
+    diff = np.all(diff > 0, axis=-1)
+    diff = np.sum(diff, axis=-1)
+    inds = np.where(diff == 0)[0]
+    dets = dets[inds]
+    return dets, inds
+
+
 def nms_iof(dets, iou_thresh):
     if len(dets) <= 0:
         return dets, np.array([], dtype=np.int64)
@@ -311,6 +325,22 @@ def test_nms_iof():
     print(dets)
     print(inds, inds.dtype)
 
+def test_remove_inside_boxes():
+    bboxes = np.array([[49.1, 32.4, 51.0, 35.9],
+                       [49.3, 32.9, 51.0, 35.3],
+                       [49.2, 31.8, 51.0, 35.4],
+                       [35.1, 11.5, 39.1, 15.7],
+                       [35.6, 11.8, 39.3, 14.2],
+                       [35.3, 11.5, 39.9, 14.5],
+                       [35.2, 11.7, 39.7, 15.7]], dtype=np.float32)
+    scores = np.array([0.9, 0.9, 0.5, 0.5, 0.5, 0.4, 0.3],
+                      dtype=np.float32)
+    dets = np.concatenate([bboxes, scores[:, None]], axis=-1)
+    # dets = np.zeros((0, 5))
+    dets, inds = remove_inside_boxes(dets)
+    print(dets)
+    print(inds, inds.dtype)
+
 
 def test_remove_small_bboxes():
     bboxes = np.array([[0, 0, 100, 100],
@@ -342,4 +372,4 @@ def test_findCountours():
     print(contour.shape)
 
 if __name__ == '__main__':
-    test_nms_iof()
+    test_remove_inside_boxes()
