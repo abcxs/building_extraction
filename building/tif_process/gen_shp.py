@@ -6,9 +6,12 @@ try:
     import ogr
 except ImportError:
     from osgeo import ogr
+try:
+    import osr
+except ImportError:
+    from osgeo import osr
 
 import os
-import osr
 import pickle
 from PIL import Image
 from utils import logger
