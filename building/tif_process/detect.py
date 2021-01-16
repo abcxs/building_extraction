@@ -1,6 +1,11 @@
 import config as cfg
 import cv2
-import gdal
+
+try:
+    import gdal
+except ImportError:
+    from osgeo import gdal
+
 import itertools
 import mmcv
 import numpy as np

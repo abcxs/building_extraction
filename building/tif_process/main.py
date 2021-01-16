@@ -2,7 +2,10 @@
 
 import argparse
 import config as cfg
-import gdal
+try:
+    import gdal
+except ImportError:
+    from osgeo import gdal
 import multiprocessing
 import os
 import pickle

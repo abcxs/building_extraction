@@ -2,7 +2,10 @@
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 import cv2
-import gdal
+try:
+    import gdal
+except ImportError:
+    from osgeo import gdal
 import logging
 import numpy as np
 import os

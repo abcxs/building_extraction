@@ -1,5 +1,12 @@
-import gdal
-import ogr
+try:
+    import gdal
+except ImportError:
+    from osgeo import gdal
+try:
+    import ogr
+except ImportError:
+    from osgeo import ogr
+
 import os
 import osr
 import pickle
