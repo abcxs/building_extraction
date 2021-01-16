@@ -7,24 +7,33 @@ ENV TORCH_CUDA_ARCH_LIST="6.0 6.1 7.0+PTX"
 ENV TORCH_NVCC_FLAGS="-Xfatbin -compress-all"
 ENV CMAKE_PREFIX_PATH="$(dirname $(which conda))/../"
 
-RUN apt-get update && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 \
+RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak
+ADD ./sources.list /etc/apt/sources.list
+
+RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get update --allow-unauthenticated && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Install gdal
+RUN conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ && \
+ conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/  && \ 
+ conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud//pytorch && \
+ conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge && \ 
+ conda config --set show_channel_urls yes
 RUN conda install -y gdal
 
 # Install MMCV
-RUN pip install mmcv-full==latest+torch1.6.0+cu101 -f https://openmmlab.oss-accelerate.aliyuncs.com/mmcv/dist/index.html
+RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ mmcv-full==1.1.5 -f https://download.openmmlab.com/mmcv/dist/cu101/torch1.6.0/index.html 
 
 # Install MMDetection
 RUN conda clean --all
 WORKDIR /root
 RUN git clone -b building https://github.com/abcxs/building_extraction.git mmdetection
 WORKDIR /root/mmdetection
-RUN git checkout builiding && git pull
+RUN git checkout building && git pull
 ENV FORCE_CUDA="1"
-RUN pip install -r requirements/build.txt && pip install --no-cache-dir -e .
+RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ -r requirements/build.txt && pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ --no-cache-dir -e .
 WORKDIR /root/mmdetection/mmdet/rotation_libs
 RUN python setup.py build_ext --inplace
 

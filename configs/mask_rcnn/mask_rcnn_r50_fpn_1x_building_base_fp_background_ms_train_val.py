@@ -27,6 +27,8 @@ train_ann_files = [data_root + '%s/train/train.json' % site for site in sites]
 train_img_prefixs = [data_root + '%s/train/JPEGImages/' % site for site in sites]
 val_ann_files = [data_root + '%s/val/val.json' % site for site in sites]
 val_img_prefixs = [data_root + '%s/val/JPEGImages/' % site for site in sites]
+train_ann_files.extend(val_ann_files)
+train_img_prefixs.extend(val_img_prefixs)
 test_ann_files = val_ann_files
 test_img_prefixs = val_img_prefixs
 data = dict(

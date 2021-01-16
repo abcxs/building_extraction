@@ -26,7 +26,7 @@ case $approx in
 		;;
 
     [nN][oO]|[nN])
-		/home/ndrcchkygb/anaconda3/envs/open-mmlab/bin/python tif_process/main.py $INPUT_DIR/$input $OUTPUT_DIR $CFG_DIR/building.py $MODEL_DIR/$model.pth --approx_polygon
+		/home/ndrcchkygb/anaconda3/envs/open-mmlab/bin/python tif_process/main.py $INPUT_DIR/$input $OUTPUT_DIR $CFG_DIR/building.py $MODEL_DIR/$model.pth
        	;;
 
     *)
