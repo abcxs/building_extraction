@@ -22,10 +22,9 @@ ADD ./jupyter_notebook_config.py /root/.jupyter/
 
 RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak
 ADD ./sources.list /etc/apt/sources.list
-RUN echo '111.2.178.68 developer.download.nvidia.cn' >> /etc/hosts
 
 #install xrdp
-RUN apt-get update && apt-get purge tightvncserver xrdp && \
+RUN apt-get update --allow-unauthenticated && apt-get purge tightvncserver xrdp && \
     apt-get install -y xrdp xfce4 xfce4-goodies vnc4server tightvncserver vim curl net-tools iputils-ping firefox sudo supervisor wget python-pip python-dev gedit \
     software-properties-common aptitude locales ttf-wqy-microhei ttf-wqy-zenhei xfonts-wqy fcitx fcitx-googlepinyin openssh-server
 RUN mkdir /var/run/sshd
@@ -50,7 +49,7 @@ WORKDIR /root/.init/jupyterlabspace
 EXPOSE $XRDP_PORT $SSH_PORT
 RUN find / -name "*.pyc" | xargs rm -rf
 
-RUN apt-get update && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 
+RUN apt-get update --allow-unauthenticated && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ && \
