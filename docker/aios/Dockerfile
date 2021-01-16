@@ -65,7 +65,7 @@ RUN conda install -y gdal
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ mmcv-full==1.1.5 -f https://download.openmmlab.com/mmcv/dist/cu101/torch1.6.0/index.html
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ SimpleITK
 # Install MMDetection
-RUN conda clean --all
+RUN conda clean -y --all
 WORKDIR /root
 RUN git clone -b building https://github.com/abcxs/building_extraction.git mmdetection
 WORKDIR /root/mmdetection
