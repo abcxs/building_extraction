@@ -59,7 +59,7 @@ RUN conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pk
  conda config --set show_channel_urls yes
 
 # Install gdal
-RUN conda install -y gdal
+RUN conda install -y gdal=2.2.2
 
 # Install MMCV
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ mmcv-full==1.1.5 -f https://download.openmmlab.com/mmcv/dist/cu101/torch1.6.0/index.html
