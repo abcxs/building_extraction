@@ -52,14 +52,8 @@ RUN find / -name "*.pyc" | xargs rm -rf
 RUN apt-get update --allow-unauthenticated && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ && \
- conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/  && \ 
- conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud//pytorch && \
- conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge && \ 
- conda config --set show_channel_urls yes
-
 # Install gdal
-RUN conda install -y gdal
+RUN conda install -y gdal=2.2.4
 
 # Install MMCV
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ mmcv-full==1.1.5 -f https://download.openmmlab.com/mmcv/dist/cu101/torch1.6.0/index.html

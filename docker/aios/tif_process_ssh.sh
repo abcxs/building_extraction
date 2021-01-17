@@ -11,7 +11,7 @@ do
 	echo -n ${file%%.*}
 	echo -n '  '
 done
-echo ')\n'
+echo ')'
 read model
 cd /root/mmdetection
 python building/tif_process/main.py $INPUT_DIR/$input $OUTPUT_DIR $CFG_DIR/building.py $MODEL_DIR/$model.pth

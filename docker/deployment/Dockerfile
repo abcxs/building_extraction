@@ -11,18 +11,12 @@ RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak
 ADD ./sources.list /etc/apt/sources.list
 
 RUN rm -rf /var/lib/apt/lists/*
-RUN apt-get update --allow-unauthenticated && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 \
+RUN apt-get update --allow-unauthenticated && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 vim \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Install gdal
-RUN conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ && \
- conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/  && \ 
- conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud//pytorch && \
- conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge && \ 
- conda config --set show_channel_urls yes
-# Install gdal
-RUN conda install -y gdal
+RUN conda install -y gdal=2.2.4
 
 # Install MMCV
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ mmcv-full==1.1.5 -f https://download.openmmlab.com/mmcv/dist/cu101/torch1.6.0/index.html 
@@ -37,8 +31,6 @@ ENV FORCE_CUDA="1"
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ -r requirements/build.txt && pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ --no-cache-dir -e .
 WORKDIR /root/mmdetection/mmdet/rotation_libs
 RUN python setup.py build_ext --inplace
-
-RUN conda install -y gdal
 
 WORKDIR /root
 ADD ./tif_process.sh /root/

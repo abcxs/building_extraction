@@ -15,7 +15,7 @@ do
 	echo -n ${file%%.*}
 	echo -n '  '
 done
-echo ')\n'
+echo ')'
 read model
 echo '是否拟合（会消耗更多时间y/n）'
 read approx

@@ -31,7 +31,7 @@ def gen_shp(ds, input_pkl, output_file, finsh_flag=None):
         ds_image = True
     else:
         geoTransform = ds.GetGeoTransform()
-    gdal.SetConfigOption('SHAPE_ENCODING', "UTF8")
+    gdal.SetConfigOption('SHAPE_ENCODING', "UTF-8")
     gdal.SetConfigOption("GDAL_FILENAME_IS_UTF8", "YES")
     ogr.RegisterAll()
     driverName = "ESRI Shapefile"
