@@ -1,7 +1,7 @@
-INPUT_DIR=/private/building/data
-OUTPUT_DIR=/private/building/result
-CFG_DIR=/private/building/cfg
-MODEL_DIR=/private/building/model
+INPUT_DIR=/private/data
+OUTPUT_DIR=/private/result
+CFG_DIR=/private/cfg
+MODEL_DIR=/private/model
 echo '输入目录:'
 read input
 echo -n '输入模型(  '

@@ -75,5 +75,6 @@ RUN mkdir -p /root/.init
 ADD ./startup.sh /root/.init
 ADD ./config.sh /root/.init
 ADD ./tif_process_aios.sh /root/tif_process.sh
+ADD ./tif_process_ssh.sh /root/tif_process_ssh.sh
 RUN chmod a+x /root/.init/startup.sh && chmod a+x /root/.init/config.sh && chmod a+x /root/tif_process.sh
 ENTRYPOINT ["/root/.init/startup.sh"]
