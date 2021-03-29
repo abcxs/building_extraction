@@ -62,8 +62,8 @@ def parse_result(result, score_thr, lt, approx_polygon=False):
     labels = np.concatenate(labels)
     inds = np.where(bboxes[:, -1] > score_thr)[0]
 
-    _, inds_inside = remove_inside_boxes(bboxes[inds])
-    inds = inds[inds_inside]
+    # _, inds_inside = remove_inside_boxes(bboxes[inds])
+    # inds = inds[inds_inside]
 
     segms = list(itertools.chain(*segm_result))
     segms = np.array(segms).astype(np.uint8)

@@ -1702,13 +1702,13 @@ static const char __pyx_k_numpy[] = "numpy";
 static const char __pyx_k_zeros[] = "zeros";
 static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_float32[] = "float32";
+static const char __pyx_k_iou_type[] = "iou_type";
 static const char __pyx_k_overlaps[] = "overlaps";
 static const char __pyx_k_device_id[] = "device_id";
 static const char __pyx_k_ValueError[] = "ValueError";
 static const char __pyx_k_ImportError[] = "ImportError";
 static const char __pyx_k_query_boxes[] = "query_boxes";
 static const char __pyx_k_RuntimeError[] = "RuntimeError";
-static const char __pyx_k_rbbx_overlaps[] = "rbbx_overlaps";
 static const char __pyx_k_rbbox_overlaps[] = "rbbox_overlaps";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_rbbox_overlaps_pyx[] = "rbbox_overlaps.pyx";
@@ -1732,6 +1732,7 @@ static PyObject *__pyx_n_s_device_id;
 static PyObject *__pyx_n_s_dtype;
 static PyObject *__pyx_n_s_float32;
 static PyObject *__pyx_n_s_import;
+static PyObject *__pyx_n_s_iou_type;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_name;
 static PyObject *__pyx_n_s_np;
@@ -1742,11 +1743,10 @@ static PyObject *__pyx_n_s_overlaps;
 static PyObject *__pyx_n_s_query_boxes;
 static PyObject *__pyx_n_s_rbbox_overlaps;
 static PyObject *__pyx_kp_s_rbbox_overlaps_pyx;
-static PyObject *__pyx_n_s_rbbx_overlaps;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_kp_u_unknown_dtype_code_in_numpy_pxd;
 static PyObject *__pyx_n_s_zeros;
-static PyObject *__pyx_pf_14rbbox_overlaps_rbbx_overlaps(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_boxes, PyArrayObject *__pyx_v_query_boxes, __pyx_t_5numpy_int32_t __pyx_v_device_id); /* proto */
+static PyObject *__pyx_pf_14rbbox_overlaps_rbbox_overlaps(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_boxes, PyArrayObject *__pyx_v_query_boxes, __pyx_t_5numpy_int32_t __pyx_v_device_id, __pyx_t_5numpy_int32_t __pyx_v_iou_type); /* proto */
 static PyObject *__pyx_tuple_;
 static PyObject *__pyx_tuple__2;
 static PyObject *__pyx_tuple__3;
@@ -1757,33 +1757,36 @@ static PyObject *__pyx_codeobj__7;
 /* Late includes */
 
 /* "rbbox_overlaps.pyx":7
- *     void _overlaps(np.float32_t*, np.float32_t*, np.float32_t*, int, int, int)
+ *     void _overlaps(np.float32_t*, np.float32_t*, np.float32_t*, int, int, int, int)
  * 
- * def rbbx_overlaps (np.ndarray[np.float32_t, ndim=2] boxes, np.ndarray[np.float32_t, ndim=2] query_boxes, np.int32_t device_id=0):             # <<<<<<<<<<<<<<
+ * def rbbox_overlaps (np.ndarray[np.float32_t, ndim=2] boxes, np.ndarray[np.float32_t, ndim=2] query_boxes, np.int32_t device_id=0, np.int32_t iou_type=0):             # <<<<<<<<<<<<<<
  *     # boxes: [x, y, w, h, theta]
  *     cdef int N = boxes.shape[0]
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_14rbbox_overlaps_1rbbx_overlaps(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_14rbbox_overlaps_1rbbx_overlaps = {"rbbx_overlaps", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_14rbbox_overlaps_1rbbx_overlaps, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_14rbbox_overlaps_1rbbx_overlaps(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_14rbbox_overlaps_1rbbox_overlaps(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_14rbbox_overlaps_1rbbox_overlaps = {"rbbox_overlaps", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_14rbbox_overlaps_1rbbox_overlaps, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_14rbbox_overlaps_1rbbox_overlaps(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyArrayObject *__pyx_v_boxes = 0;
   PyArrayObject *__pyx_v_query_boxes = 0;
   __pyx_t_5numpy_int32_t __pyx_v_device_id;
+  __pyx_t_5numpy_int32_t __pyx_v_iou_type;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("rbbx_overlaps (wrapper)", 0);
+  __Pyx_RefNannySetupContext("rbbox_overlaps (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_boxes,&__pyx_n_s_query_boxes,&__pyx_n_s_device_id,0};
-    PyObject* values[3] = {0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_boxes,&__pyx_n_s_query_boxes,&__pyx_n_s_device_id,&__pyx_n_s_iou_type,0};
+    PyObject* values[4] = {0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
         CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
@@ -1802,7 +1805,7 @@ static PyObject *__pyx_pw_14rbbox_overlaps_1rbbx_overlaps(PyObject *__pyx_self, 
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_query_boxes)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("rbbx_overlaps", 0, 2, 3, 1); __PYX_ERR(0, 7, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("rbbox_overlaps", 0, 2, 4, 1); __PYX_ERR(0, 7, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -1810,12 +1813,20 @@ static PyObject *__pyx_pw_14rbbox_overlaps_1rbbx_overlaps(PyObject *__pyx_self, 
           PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_device_id);
           if (value) { values[2] = value; kw_args--; }
         }
+        CYTHON_FALLTHROUGH;
+        case  3:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_iou_type);
+          if (value) { values[3] = value; kw_args--; }
+        }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "rbbx_overlaps") < 0)) __PYX_ERR(0, 7, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "rbbox_overlaps") < 0)) __PYX_ERR(0, 7, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
         CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
@@ -1831,18 +1842,23 @@ static PyObject *__pyx_pw_14rbbox_overlaps_1rbbx_overlaps(PyObject *__pyx_self, 
     } else {
       __pyx_v_device_id = ((__pyx_t_5numpy_int32_t)0);
     }
+    if (values[3]) {
+      __pyx_v_iou_type = __Pyx_PyInt_As_npy_int32(values[3]); if (unlikely((__pyx_v_iou_type == ((npy_int32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 7, __pyx_L3_error)
+    } else {
+      __pyx_v_iou_type = ((__pyx_t_5numpy_int32_t)0);
+    }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("rbbx_overlaps", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 7, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("rbbox_overlaps", 0, 2, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 7, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("rbbox_overlaps.rbbx_overlaps", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("rbbox_overlaps.rbbox_overlaps", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_boxes), __pyx_ptype_5numpy_ndarray, 1, "boxes", 0))) __PYX_ERR(0, 7, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_query_boxes), __pyx_ptype_5numpy_ndarray, 1, "query_boxes", 0))) __PYX_ERR(0, 7, __pyx_L1_error)
-  __pyx_r = __pyx_pf_14rbbox_overlaps_rbbx_overlaps(__pyx_self, __pyx_v_boxes, __pyx_v_query_boxes, __pyx_v_device_id);
+  __pyx_r = __pyx_pf_14rbbox_overlaps_rbbox_overlaps(__pyx_self, __pyx_v_boxes, __pyx_v_query_boxes, __pyx_v_device_id, __pyx_v_iou_type);
 
   /* function exit code */
   goto __pyx_L0;
@@ -1853,7 +1869,7 @@ static PyObject *__pyx_pw_14rbbox_overlaps_1rbbx_overlaps(PyObject *__pyx_self, 
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_14rbbox_overlaps_rbbx_overlaps(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_boxes, PyArrayObject *__pyx_v_query_boxes, __pyx_t_5numpy_int32_t __pyx_v_device_id) {
+static PyObject *__pyx_pf_14rbbox_overlaps_rbbox_overlaps(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_boxes, PyArrayObject *__pyx_v_query_boxes, __pyx_t_5numpy_int32_t __pyx_v_device_id, __pyx_t_5numpy_int32_t __pyx_v_iou_type) {
   int __pyx_v_N;
   int __pyx_v_K;
   PyArrayObject *__pyx_v_overlaps = 0;
@@ -1881,7 +1897,7 @@ static PyObject *__pyx_pf_14rbbox_overlaps_rbbx_overlaps(CYTHON_UNUSED PyObject 
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("rbbx_overlaps", 0);
+  __Pyx_RefNannySetupContext("rbbox_overlaps", 0);
   __pyx_pybuffer_overlaps.pybuffer.buf = NULL;
   __pyx_pybuffer_overlaps.refcount = 0;
   __pyx_pybuffernd_overlaps.data = NULL;
@@ -1906,7 +1922,7 @@ static PyObject *__pyx_pf_14rbbox_overlaps_rbbx_overlaps(CYTHON_UNUSED PyObject 
   __pyx_pybuffernd_query_boxes.diminfo[0].strides = __pyx_pybuffernd_query_boxes.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_query_boxes.diminfo[0].shape = __pyx_pybuffernd_query_boxes.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_query_boxes.diminfo[1].strides = __pyx_pybuffernd_query_boxes.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_query_boxes.diminfo[1].shape = __pyx_pybuffernd_query_boxes.rcbuffer->pybuffer.shape[1];
 
   /* "rbbox_overlaps.pyx":9
- * def rbbx_overlaps (np.ndarray[np.float32_t, ndim=2] boxes, np.ndarray[np.float32_t, ndim=2] query_boxes, np.int32_t device_id=0):
+ * def rbbox_overlaps (np.ndarray[np.float32_t, ndim=2] boxes, np.ndarray[np.float32_t, ndim=2] query_boxes, np.int32_t device_id=0, np.int32_t iou_type=0):
  *     # boxes: [x, y, w, h, theta]
  *     cdef int N = boxes.shape[0]             # <<<<<<<<<<<<<<
  *     cdef int K = query_boxes.shape[0]
@@ -1919,7 +1935,7 @@ static PyObject *__pyx_pf_14rbbox_overlaps_rbbx_overlaps(CYTHON_UNUSED PyObject 
  *     cdef int N = boxes.shape[0]
  *     cdef int K = query_boxes.shape[0]             # <<<<<<<<<<<<<<
  *     cdef np.ndarray[np.float32_t, ndim=2] overlaps = np.zeros((N, K), dtype = np.float32)
- *     _overlaps(&overlaps[0, 0], &boxes[0, 0], &query_boxes[0, 0], N, K, device_id)
+ *     _overlaps(&overlaps[0, 0], &boxes[0, 0], &query_boxes[0, 0], N, K, device_id, iou_type)
  */
   __pyx_v_K = (__pyx_v_query_boxes->dimensions[0]);
 
@@ -1927,7 +1943,7 @@ static PyObject *__pyx_pf_14rbbox_overlaps_rbbx_overlaps(CYTHON_UNUSED PyObject 
  *     cdef int N = boxes.shape[0]
  *     cdef int K = query_boxes.shape[0]
  *     cdef np.ndarray[np.float32_t, ndim=2] overlaps = np.zeros((N, K), dtype = np.float32)             # <<<<<<<<<<<<<<
- *     _overlaps(&overlaps[0, 0], &boxes[0, 0], &query_boxes[0, 0], N, K, device_id)
+ *     _overlaps(&overlaps[0, 0], &boxes[0, 0], &query_boxes[0, 0], N, K, device_id, iou_type)
  *     return overlaps
  */
   __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
@@ -1983,7 +1999,7 @@ static PyObject *__pyx_pf_14rbbox_overlaps_rbbx_overlaps(CYTHON_UNUSED PyObject 
   /* "rbbox_overlaps.pyx":12
  *     cdef int K = query_boxes.shape[0]
  *     cdef np.ndarray[np.float32_t, ndim=2] overlaps = np.zeros((N, K), dtype = np.float32)
- *     _overlaps(&overlaps[0, 0], &boxes[0, 0], &query_boxes[0, 0], N, K, device_id)             # <<<<<<<<<<<<<<
+ *     _overlaps(&overlaps[0, 0], &boxes[0, 0], &query_boxes[0, 0], N, K, device_id, iou_type)             # <<<<<<<<<<<<<<
  *     return overlaps
  * 
  */
@@ -2032,11 +2048,11 @@ static PyObject *__pyx_pf_14rbbox_overlaps_rbbx_overlaps(CYTHON_UNUSED PyObject 
     __Pyx_RaiseBufferIndexError(__pyx_t_9);
     __PYX_ERR(0, 12, __pyx_L1_error)
   }
-  _overlaps((&(*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_overlaps.rcbuffer->pybuffer.buf, __pyx_t_7, __pyx_pybuffernd_overlaps.diminfo[0].strides, __pyx_t_8, __pyx_pybuffernd_overlaps.diminfo[1].strides))), (&(*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_boxes.rcbuffer->pybuffer.buf, __pyx_t_10, __pyx_pybuffernd_boxes.diminfo[0].strides, __pyx_t_11, __pyx_pybuffernd_boxes.diminfo[1].strides))), (&(*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_query_boxes.rcbuffer->pybuffer.buf, __pyx_t_12, __pyx_pybuffernd_query_boxes.diminfo[0].strides, __pyx_t_13, __pyx_pybuffernd_query_boxes.diminfo[1].strides))), __pyx_v_N, __pyx_v_K, __pyx_v_device_id);
+  _overlaps((&(*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_overlaps.rcbuffer->pybuffer.buf, __pyx_t_7, __pyx_pybuffernd_overlaps.diminfo[0].strides, __pyx_t_8, __pyx_pybuffernd_overlaps.diminfo[1].strides))), (&(*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_boxes.rcbuffer->pybuffer.buf, __pyx_t_10, __pyx_pybuffernd_boxes.diminfo[0].strides, __pyx_t_11, __pyx_pybuffernd_boxes.diminfo[1].strides))), (&(*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_query_boxes.rcbuffer->pybuffer.buf, __pyx_t_12, __pyx_pybuffernd_query_boxes.diminfo[0].strides, __pyx_t_13, __pyx_pybuffernd_query_boxes.diminfo[1].strides))), __pyx_v_N, __pyx_v_K, __pyx_v_device_id, __pyx_v_iou_type);
 
   /* "rbbox_overlaps.pyx":13
  *     cdef np.ndarray[np.float32_t, ndim=2] overlaps = np.zeros((N, K), dtype = np.float32)
- *     _overlaps(&overlaps[0, 0], &boxes[0, 0], &query_boxes[0, 0], N, K, device_id)
+ *     _overlaps(&overlaps[0, 0], &boxes[0, 0], &query_boxes[0, 0], N, K, device_id, iou_type)
  *     return overlaps             # <<<<<<<<<<<<<<
  * 
  * 
@@ -2047,9 +2063,9 @@ static PyObject *__pyx_pf_14rbbox_overlaps_rbbx_overlaps(CYTHON_UNUSED PyObject 
   goto __pyx_L0;
 
   /* "rbbox_overlaps.pyx":7
- *     void _overlaps(np.float32_t*, np.float32_t*, np.float32_t*, int, int, int)
+ *     void _overlaps(np.float32_t*, np.float32_t*, np.float32_t*, int, int, int, int)
  * 
- * def rbbx_overlaps (np.ndarray[np.float32_t, ndim=2] boxes, np.ndarray[np.float32_t, ndim=2] query_boxes, np.int32_t device_id=0):             # <<<<<<<<<<<<<<
+ * def rbbox_overlaps (np.ndarray[np.float32_t, ndim=2] boxes, np.ndarray[np.float32_t, ndim=2] query_boxes, np.int32_t device_id=0, np.int32_t iou_type=0):             # <<<<<<<<<<<<<<
  *     # boxes: [x, y, w, h, theta]
  *     cdef int N = boxes.shape[0]
  */
@@ -2069,7 +2085,7 @@ static PyObject *__pyx_pf_14rbbox_overlaps_rbbx_overlaps(CYTHON_UNUSED PyObject 
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_overlaps.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_query_boxes.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("rbbox_overlaps.rbbx_overlaps", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("rbbox_overlaps.rbbox_overlaps", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
@@ -3735,6 +3751,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_dtype, __pyx_k_dtype, sizeof(__pyx_k_dtype), 0, 0, 1, 1},
   {&__pyx_n_s_float32, __pyx_k_float32, sizeof(__pyx_k_float32), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
+  {&__pyx_n_s_iou_type, __pyx_k_iou_type, sizeof(__pyx_k_iou_type), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
   {&__pyx_n_s_np, __pyx_k_np, sizeof(__pyx_k_np), 0, 0, 1, 1},
@@ -3745,7 +3762,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_query_boxes, __pyx_k_query_boxes, sizeof(__pyx_k_query_boxes), 0, 0, 1, 1},
   {&__pyx_n_s_rbbox_overlaps, __pyx_k_rbbox_overlaps, sizeof(__pyx_k_rbbox_overlaps), 0, 0, 1, 1},
   {&__pyx_kp_s_rbbox_overlaps_pyx, __pyx_k_rbbox_overlaps_pyx, sizeof(__pyx_k_rbbox_overlaps_pyx), 0, 0, 1, 0},
-  {&__pyx_n_s_rbbx_overlaps, __pyx_k_rbbx_overlaps, sizeof(__pyx_k_rbbx_overlaps), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {&__pyx_kp_u_unknown_dtype_code_in_numpy_pxd, __pyx_k_unknown_dtype_code_in_numpy_pxd, sizeof(__pyx_k_unknown_dtype_code_in_numpy_pxd), 0, 1, 0, 0},
   {&__pyx_n_s_zeros, __pyx_k_zeros, sizeof(__pyx_k_zeros), 0, 0, 1, 1},
@@ -3820,16 +3836,16 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__5);
 
   /* "rbbox_overlaps.pyx":7
- *     void _overlaps(np.float32_t*, np.float32_t*, np.float32_t*, int, int, int)
+ *     void _overlaps(np.float32_t*, np.float32_t*, np.float32_t*, int, int, int, int)
  * 
- * def rbbx_overlaps (np.ndarray[np.float32_t, ndim=2] boxes, np.ndarray[np.float32_t, ndim=2] query_boxes, np.int32_t device_id=0):             # <<<<<<<<<<<<<<
+ * def rbbox_overlaps (np.ndarray[np.float32_t, ndim=2] boxes, np.ndarray[np.float32_t, ndim=2] query_boxes, np.int32_t device_id=0, np.int32_t iou_type=0):             # <<<<<<<<<<<<<<
  *     # boxes: [x, y, w, h, theta]
  *     cdef int N = boxes.shape[0]
  */
-  __pyx_tuple__6 = PyTuple_Pack(6, __pyx_n_s_boxes, __pyx_n_s_query_boxes, __pyx_n_s_device_id, __pyx_n_s_N, __pyx_n_s_K, __pyx_n_s_overlaps); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_tuple__6 = PyTuple_Pack(7, __pyx_n_s_boxes, __pyx_n_s_query_boxes, __pyx_n_s_device_id, __pyx_n_s_iou_type, __pyx_n_s_N, __pyx_n_s_K, __pyx_n_s_overlaps); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
-  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__6, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rbbox_overlaps_pyx, __pyx_n_s_rbbx_overlaps, 7, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(4, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__6, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rbbox_overlaps_pyx, __pyx_n_s_rbbox_overlaps, 7, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -4153,15 +4169,15 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "rbbox_overlaps.pyx":7
- *     void _overlaps(np.float32_t*, np.float32_t*, np.float32_t*, int, int, int)
+ *     void _overlaps(np.float32_t*, np.float32_t*, np.float32_t*, int, int, int, int)
  * 
- * def rbbx_overlaps (np.ndarray[np.float32_t, ndim=2] boxes, np.ndarray[np.float32_t, ndim=2] query_boxes, np.int32_t device_id=0):             # <<<<<<<<<<<<<<
+ * def rbbox_overlaps (np.ndarray[np.float32_t, ndim=2] boxes, np.ndarray[np.float32_t, ndim=2] query_boxes, np.int32_t device_id=0, np.int32_t iou_type=0):             # <<<<<<<<<<<<<<
  *     # boxes: [x, y, w, h, theta]
  *     cdef int N = boxes.shape[0]
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_14rbbox_overlaps_1rbbx_overlaps, NULL, __pyx_n_s_rbbox_overlaps); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_14rbbox_overlaps_1rbbox_overlaps, NULL, __pyx_n_s_rbbox_overlaps); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_rbbx_overlaps, __pyx_t_1) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_rbbox_overlaps, __pyx_t_1) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "rbbox_overlaps.pyx":1

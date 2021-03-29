@@ -244,7 +244,7 @@ __device__ inline float inter(float const * const region1, float const * const r
   
 }
 
-__device__ inline float devRotateIoU(float const * const region1, float const * const region2) {
+__device__ inline float devRotateIoU(float const * const region1, float const * const region2, int iou_type) {
   
   if((fabs(region1[0] - region2[0]) < 1e-5) && (fabs(region1[1] - region2[1]) < 1e-5) && (fabs(region1[2] - region2[2]) < 1e-5) && (fabs(region1[3] - region2[3]) < 1e-5) && (fabs(region1[4] - region2[4]) < 1e-5)) {
     return 1.0;
@@ -253,7 +253,12 @@ __device__ inline float devRotateIoU(float const * const region1, float const * 
   float area1 = region1[2] * region1[3];
   float area2 = region2[2] * region2[3];
   float area_inter = inter(region1, region2);
-  float result = area_inter / (area1 + area2 - area_inter);
+  float result = 0;
+  if(iou_type == 0){
+    result = area_inter / (area1 + area2 - area_inter);
+  }else
+    result = area_inter / area1;
+  
   if(result < 0) {
     result = 0.0;
   }
@@ -263,7 +268,7 @@ __device__ inline float devRotateIoU(float const * const region1, float const * 
 }
 
 __global__ void overlaps_kernel(const int N, const int K, const float* dev_boxes,
-                           const float * dev_query_boxes, float* dev_overlaps) {
+                           const float * dev_query_boxes, float* dev_overlaps, const int iou_type) {
 
   const int col_start = blockIdx.y;
   const int row_start = blockIdx.x;
@@ -308,7 +313,7 @@ __global__ void overlaps_kernel(const int N, const int K, const float* dev_boxes
 
     for(int i = 0;i < col_size; i++) {
       int offset = row_start*threadsPerBlock * K + col_start*threadsPerBlock + threadIdx.x*K+ i ;
-      dev_overlaps[offset] = devRotateIoU(block_boxes + threadIdx.x * 5, block_query_boxes + i * 5);
+      dev_overlaps[offset] = devRotateIoU(block_boxes + threadIdx.x * 5, block_query_boxes + i * 5, iou_type);
     }
 
   }
@@ -327,7 +332,7 @@ void _set_device(int device_id) {
 }
 
 
-void _overlaps(float* overlaps,const float* boxes,const float* query_boxes, int n, int k, int device_id) {
+void _overlaps(float* overlaps,const float* boxes,const float* query_boxes, int n, int k, int device_id, int iou_type) {
 
   _set_device(device_id);
 
@@ -374,7 +379,7 @@ void _overlaps(float* overlaps,const float* boxes,const float* query_boxes, int 
   overlaps_kernel<<<blocks, threads>>>(n, k,
                                     boxes_dev,
                                     query_boxes_dev,
-                                    overlaps_dev);  
+                                    overlaps_dev, iou_type);  
 
 
 

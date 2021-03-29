@@ -7,7 +7,7 @@ import numpy as np
 import os
 import pickle
 import torch
-from utils import get_gpus, nms_bbox, nms_rbox, remove_small_bboxes
+from utils import get_gpus, nms_bbox, nms_rbox, rbbox_iou, remove_small_bboxes
 
 
 class BoxList(object):
@@ -107,8 +107,8 @@ def post_process(output_dir, cfg, width, height):
 
     temp_bboxes = torch.from_numpy(bboxes_tif).reshape(-1, 6)
     labels, scores, bboxes = torch.split(temp_bboxes, [1, 1, 4], dim=1)
-    labels = labels.squeeze()
-    scores = scores.squeeze()
+    labels = labels.squeeze(-1)
+    scores = scores.squeeze(-1)
 
     polys = torch.from_numpy(polys_tif).reshape(-1, 7)
 
@@ -187,8 +187,8 @@ def post_process(output_dir, cfg, width, height):
     polys = polys[inds]
 
     labels, scores, rboxes = torch.split(polys, [1, 1, 5], dim=1)
-    labels = labels.squeeze()
-    scores = scores.squeeze()
+    labels = labels.squeeze(-1)
+    scores = scores.squeeze(-1)
     boxlist = BoxList(rboxes)
     boxlist.add_field('labels', labels)
     boxlist.add_field('scores', scores)
@@ -224,9 +224,21 @@ def post_process(output_dir, cfg, width, height):
             boxlist_in_range = cat_boxlist(boxlist_in_range_cate)
             boxlist = cat_boxlist([boxlist_in_range, boxlist[id_out_range]])
 
-    labels = boxlist.get_field('labels').tolist()
-    scores = boxlist.get_field('scores').tolist()
+    labels = boxlist.get_field('labels')
+    scores = boxlist.get_field('scores')
     rboxes = boxlist.bboxes
+
+    pps = rboxes[:, -5:].contiguous()
+    pp_iou = rbbox_iou(pps, pps, iou_type='iof')
+    pp_iou[torch.arange(len(pp_iou)), torch.arange(len(pp_iou))] = 0
+    if pp_iou.numel():
+        max_iou, ids = pp_iou.max(dim=-1)
+        pp_inds = max_iou < 0.7
+    else:
+        pp_inds = torch.zeros((0, ), dtype=torch.bool)
+    rboxes = rboxes[pp_inds]
+    labels = labels[pp_inds].tolist()
+    scores = scores[pp_inds].tolist()
 
     for rbox, label, score in zip(rboxes, labels, scores):
         label = int(label)

@@ -2,10 +2,12 @@
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 import cv2
+
 try:
     import gdal
 except ImportError:
     from osgeo import gdal
+
 import logging
 import numpy as np
 import os
@@ -17,6 +19,7 @@ from mmcv.ops import bbox_overlaps
 from mmcv.ops.nms import nms
 from PIL import Image
 
+from mmdet.rotation_libs.rbbox_overlaps import rbbox_overlaps
 from mmdet.rotation_libs.rotate_polygon_nms import rotate_gpu_nms
 
 
@@ -70,6 +73,24 @@ def cut_into_pieces(tif_file, cfg):
     piece_list = cut_into_(width, height, piece_size, piece_overlap_size)
     return piece_list
 
+def rbbox_iou(rbboxes1, rbboxes2, iou_type='iou'):
+    t = 0
+    if isinstance(rbboxes1, torch.Tensor):
+        t = 1
+    if len(rbboxes1) <= 0 or len(rbboxes2) <= 0:
+        iou = np.zeros((len(rbboxes1), len(rbboxes2)))
+    else:
+        if isinstance(rbboxes1, torch.Tensor):
+            rbboxes1 = rbboxes1.numpy()
+            rbboxes2 = rbboxes2.numpy()
+        if iou_type == 'iou':
+            iou_t = 0
+        else:
+            iou_t = 1
+        iou = rbbox_overlaps(rbboxes1, rbboxes2, 0, iou_t)
+    if t:
+        iou = torch.from_numpy(iou)
+    return iou
 
 def cut_into_blocks(ds, piece, cfg):
     detect_size = cfg.detect_size
@@ -170,11 +191,13 @@ def remove_inside_boxes(dets):
     diff = dets[:, None] - dets[None]
     diff = diff[..., :4]
     diff[..., 2:] *= -1
-    diff = np.all(diff > 0, axis=-1)
+    diff[np.arange(len(diff)), np.arange(len(diff)), :] = -100
+    diff = np.all(diff >= -20, axis=-1)
     diff = np.sum(diff, axis=-1)
     inds = np.where(diff == 0)[0]
     dets = dets[inds]
     return dets, inds
+
 
 
 def nms_iof(dets, iou_thresh):
@@ -311,6 +334,19 @@ def test_bbox():
     print(dets)
     print(inds, inds.dtype)
 
+def test_rbox_iof():
+    bboxes = np.array([
+        [0, 0, 100, 50, -90],
+        [0, 0, 50, 100, -90],
+        [126.7500, 1873.2501,   37.4767,   19.7990,  -45.0000],
+        [2466.8801, 2860.1599,   27.6000,   48.4000,  -53.1301],
+        [211.7025, 1893.6731,   28.9900,   54.7814,  -58.2405],
+        [263.3852, 2359.5608,   24.6445,   14.0660,  -54.4623]
+    ], dtype=np.float32)
+    pp_iou = rbbox_iou(bboxes, bboxes, 'iou')
+    pp_iou[np.arange(len(pp_iou)), np.arange(len(pp_iou))] = 0
+    print(pp_iou)
+
 def test_nms_iof():
     # bboxes = np.array([[49.1, 32.4, 51.0, 35.9],
     #                    [49.3, 32.9, 51.0, 35.3],
@@ -375,4 +411,4 @@ def test_findCountours():
     print(contour.shape)
 
 if __name__ == '__main__':
-    test_remove_inside_boxes()
+    test_rbox_iof()
